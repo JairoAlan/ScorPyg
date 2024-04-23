@@ -3,6 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import io
+import requests
+from PIL import Image
 
 # Inicializar Pygame
 pygame.init()
@@ -13,7 +15,7 @@ WHITE = (255, 255, 255)
 
 # Definir la pantalla
 screen_width = 1550
-screen_height = 785
+screen_height = 800
 screen = pygame.display.set_mode((screen_width, screen_height),pygame.RESIZABLE)
 pygame.display.set_caption("Equipo Scorpion")
 
@@ -28,14 +30,26 @@ def draw_graph3(surface, image):
     surface.blit(image, (897, 104))
 
 def draw_graph4(surface, image):
-    surface.blit(image, (599, 699))
+    surface.blit(image, (599, 599))
     
 def draw_graph5(surface, image):
-    surface.blit(image, (897, 699))
+    surface.blit(image, (897, 599))
 
 # Función para cargar datos desde el archivo CSV
 def load_data_from_csv(filename):
     return pd.read_csv(filename)
+
+
+# Función para cargar el mapa de Google Maps
+def cargar_mapa(latitud, longitud, zoom, tamaño):
+    api_key = "AIzaSyDzdqPpaND_WEWZauxETqi5AdfhaCDI7yw" 
+    marker = f"markers=color:red|label:U|{latitud},{longitud}"
+    url = f"https://maps.googleapis.com/maps/api/staticmap?center={latitud},{longitud}&zoom={zoom}&size={tamaño}&key={api_key}&{marker}&maptype=satellite"
+    response = requests.get(url)
+    img = Image.open(io.BytesIO(response.content))
+    img.save("mapa_temp.png")  # Guarda temporalmente la imagen
+    mapa = pygame.image.load("mapa_temp.png")
+    return mapa
 
 # Función para generar la gráfica usando matplotlib
 def generate_graph(data, i):
@@ -107,6 +121,14 @@ def generate_graph5(data, i):
 filename = 'data_Sat.csv'
 data = load_data_from_csv(filename)
 
+latitud = "20.1352722"
+longitud = "-98.383043"
+zoom = 18
+tamaño = "400x300"
+
+mapa = cargar_mapa(latitud, longitud, zoom, tamaño)
+
+
 # Bucle principal
 running = True
 i = 0
@@ -117,6 +139,7 @@ while running:
 
     # Limpiar la pantalla
     screen.fill(WHITE)
+    screen.blit(mapa, (50, 450))
 
     # Generar la gráfica
     graph_image = generate_graph(data, i)
