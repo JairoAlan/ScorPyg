@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import io
 import requests
-from PIL import Image
+from PIL import Image,ImageDraw, ImageFont
+from geopy.distance import geodesic
 
 # Inicializar Pygame
 pygame.init()
@@ -41,15 +42,38 @@ def load_data_from_csv(filename):
 
 
 # Función para cargar el mapa de Google Maps
-def cargar_mapa(latitud, longitud, zoom, tamaño):
+def cargar_mapa(mi_latitud, mi_longitud, destino_latitud, destino_longitud, zoom, tamaño):
     api_key = "AIzaSyDzdqPpaND_WEWZauxETqi5AdfhaCDI7yw" 
-    marker = f"markers=color:red|label:U|{latitud},{longitud}"
-    url = f"https://maps.googleapis.com/maps/api/staticmap?center={latitud},{longitud}&zoom={zoom}&size={tamaño}&key={api_key}&{marker}&maptype=satellite"
+    maptype = "satellite"
+    marker_destino = f"markers=color:red|label:D|{destino_latitud},{destino_longitud}"
+    marker_origen = f"markers=color:green|label:U|{mi_latitud},{mi_longitud}"
+    distancia = geodesic((mi_latitud, mi_longitud), (destino_latitud, destino_longitud)).meters
+    texto_distancia = f"Distancia al destino: {distancia:.2f} mts"
+    url = f"https://maps.googleapis.com/maps/api/staticmap?center={mi_latitud},{mi_longitud}&zoom={zoom}&size={tamaño}&key={api_key}&maptype={maptype}&{marker_destino}&{marker_origen}&markers=size:mid|color:blue|label:D|{mi_latitud},{mi_longitud}&path=color:0x0000ff|weight:5|{mi_latitud},{mi_longitud}|{destino_latitud},{destino_longitud}"
     response = requests.get(url)
     img = Image.open(io.BytesIO(response.content))
+    
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.truetype("arial.ttf", 20)
+    draw.text((10, 10), texto_distancia, fill="white", font=font)
+
     img.save("mapa_temp.png")  # Guarda temporalmente la imagen
     mapa = pygame.image.load("mapa_temp.png")
     return mapa
+
+def obtener_ubicacion_actual():
+    api_key = "AIzaSyDzdqPpaND_WEWZauxETqi5AdfhaCDI7yw" 
+    url = f"https://www.googleapis.com/geolocation/v1/geolocate?key={api_key}"
+    response = requests.post(url)
+    data = response.json()
+    print(data)
+    if 'location' in data:
+        latitud = data['location']['lat']
+        longitud = data['location']['lng']
+        return latitud, longitud
+    else:
+        print("No se pudo obtener la ubicación.")
+        return None, None
 
 # Función para generar la gráfica usando matplotlib
 def generate_graph(data, i):
@@ -121,12 +145,21 @@ def generate_graph5(data, i):
 filename = 'data_Sat.csv'
 data = load_data_from_csv(filename)
 
-latitud = "20.1352722"
-longitud = "-98.383043"
+# Obtiene la ubicación actual
+latitud, longitud = obtener_ubicacion_actual()
+
+if latitud is not None and longitud is not None:
+    print(f"Tus coordenadas actuales son: Latitud: {latitud}, Longitud: {longitud}")
+else:
+    print("No se pudieron obtener las coordenadas actuales.")
+
+# Destino
+deslatitud = "20.1352721"
+deslong = "-98.385339"
 zoom = 18
 tamaño = "400x300"
 
-mapa = cargar_mapa(latitud, longitud, zoom, tamaño)
+mapa = cargar_mapa(latitud, longitud,deslatitud,deslong, zoom, tamaño)
 
 
 # Bucle principal
