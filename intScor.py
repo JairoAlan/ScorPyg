@@ -67,7 +67,7 @@ def cargar_mapa(mi_latitud, mi_longitud, destino_latitud, destino_longitud, zoom
     marker_origen = f"markers=color:green|label:U|{mi_latitud},{mi_longitud}"
     distancia = geodesic((mi_latitud, mi_longitud), (destino_latitud, destino_longitud)).meters
     texto_distancia = f"Distancia al destino: {distancia:.2f} mts"
-    url = f"https://maps.googleapis.com/maps/api/staticmap?center={mi_latitud},{mi_longitud}&zoom={zoom}&size={tamaño}&key={api_key}&maptype={maptype}&{marker_destino}&{marker_origen}&markers=size:mid|color:blue|label:D|{mi_latitud},{mi_longitud}&path=color:0x0000ff|weight:5|{mi_latitud},{mi_longitud}|{destino_latitud},{destino_longitud}"
+    url = f"https://maps.googleapis.com/maps/api/staticmap?center={destino_latitud},{destino_longitud}&zoom={zoom}&size={tamaño}&key={api_key}&maptype={maptype}&{marker_destino}&{marker_origen}&markers=size:mid|color:blue|label:D|{mi_latitud},{mi_longitud}&path=color:0x0000ff|weight:5|{mi_latitud},{mi_longitud}|{destino_latitud},{destino_longitud}"
     response = requests.get(url)
     img = Image.open(io.BytesIO(response.content))
     
@@ -172,8 +172,8 @@ data = load_data_from_csv(filename)
 latitud, longitud = obtener_ubicacion_actual()
 
 # Destino debera tener las del satelite cansat
-des_latitud = "20.1352721"
-des_long = "-98.385339"
+des_latitud = "20.133534"
+des_long = "-98.383157"
 zoom = 18
 tamaño = "550x550"
 
