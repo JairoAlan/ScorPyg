@@ -66,7 +66,7 @@ def obtener_ubicacion_actual():
     url = f"https://www.googleapis.com/geolocation/v1/geolocate?key={api_key}"
     response = requests.post(url)
     data = response.json()
-    print(data)
+    #print(data)
     if 'location' in data:
         latitud = data['location']['lat']
         longitud = data['location']['lng']
@@ -148,18 +148,13 @@ data = load_data_from_csv(filename)
 # Obtiene la ubicación actual
 latitud, longitud = obtener_ubicacion_actual()
 
-if latitud is not None and longitud is not None:
-    print(f"Tus coordenadas actuales son: Latitud: {latitud}, Longitud: {longitud}")
-else:
-    print("No se pudieron obtener las coordenadas actuales.")
-
-# Destino
-deslatitud = "20.1352721"
-deslong = "-98.385339"
+# Destino debera tener las del satelite cansat
+des_latitud = "20.1352721"
+des_long = "-98.385339"
 zoom = 18
 tamaño = "400x300"
 
-mapa = cargar_mapa(latitud, longitud,deslatitud,deslong, zoom, tamaño)
+mapa = cargar_mapa(latitud, longitud,des_latitud,des_long, zoom, tamaño)
 
 
 # Bucle principal
