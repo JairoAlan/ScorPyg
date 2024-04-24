@@ -3,38 +3,56 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import io
+import os
 import requests
+import button
 from PIL import Image,ImageDraw, ImageFont
 from geopy.distance import geodesic
+
+x = 0
+y = 30
+os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (x,y)
 
 # Inicializar Pygame
 pygame.init()
 
 # Definir colores
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
+BLACK      =  (0, 0, 0)
+WHITE      =  (255, 255, 255)
+lila       =  (242, 223, 247)
+morado     =  (75, 41, 157)
+amarillo   =  (253, 183, 15)
+gris       =  (240, 240, 240)
+marcadorC  =  (207, 170, 255)
+marcadorT  =  (170, 192, 255)
 
 # Definir la pantalla
-screen_width = 1550
-screen_height = 800
-screen = pygame.display.set_mode((screen_width, screen_height),pygame.RESIZABLE)
+size = (1920, 990)
+screen = pygame.display.set_mode(size, pygame.RESIZABLE)
 pygame.display.set_caption("Equipo Scorpion")
 
-# Función para dibujar el gráfico en Pygame
-def draw_graph(surface, image):
-    surface.blit(image, (599, 294))
-    
-def draw_graph2(surface, image):
-    surface.blit(image, (599, 100))
-    
-def draw_graph3(surface, image):
-    surface.blit(image, (897, 104))
+# Cargar imagenes
+logo = pygame.image.load('Img/Scorpion.png')
+logou = pygame.image.load('Img/upt.png')
+reporte = pygame.image.load('Img/reporte.png').convert_alpha()
 
-def draw_graph4(surface, image):
-    surface.blit(image, (599, 599))
-    
-def draw_graph5(surface, image):
-    surface.blit(image, (897, 599))
+# Definir botón
+boton_reporte = button.Button(1450, 15, reporte, 1)
+
+# Escribir textos para la interfaz
+encabezado = pygame.font.SysFont("Arial Black", 50)
+seccion = pygame.font.SysFont("Century Gothic", 20)
+tablaE = pygame.font.SysFont("Century Gothic", 15, bold=True)
+
+# Funcion para dibujar texto
+def draw_text(text, font, text_clr, corX, corY):
+    img = font.render(text, True, text_clr)
+    screen. blit(img, (corX, corY))
+
+# Función para dibujar el gráfico en Pygame
+def draw_graph(surface, image, posX, posY):
+    surface.blit(image, (posX, posY))
+
 
 # Función para cargar datos desde el archivo CSV
 def load_data_from_csv(filename):
@@ -78,8 +96,9 @@ def obtener_ubicacion_actual():
 # Función para generar la gráfica usando matplotlib
 def generate_graph(data, i):
     plt.cla()
-    plt.figure(figsize=(5, 4),dpi=80)
-    plt.plot(data['Tiempo'][:i+1], data['Altitud'][:i+1])  
+    plt.figure(figsize=(11.5, 4),dpi=60,facecolor="#F0F0F0")
+    plt.gca().set_facecolor('#F0F0F0')
+    plt.plot(data['Tiempo'][:i+1], data['Altitud'][:i+1], color="#4B299D")  
     plt.xlabel('Tiempo')
     plt.ylabel('Altitud')
     plt.title('Altitud con respecto al Tiempo')
@@ -91,8 +110,9 @@ def generate_graph(data, i):
 
 def generate_graph2(data, i):
     plt.cla()
-    plt.figure(figsize=(5, 4),dpi=50)
-    plt.plot(data['Tiempo'][:i+1], data['Temperatura'][:i+1])  
+    plt.figure(figsize=(6.5, 4),dpi=50,facecolor="#F0F0F0")
+    plt.gca().set_facecolor('#F0F0F0')
+    plt.plot(data['Tiempo'][:i+1], data['Temperatura'][:i+1], color="#4B299D")  
     plt.xlabel('Tiempo')
     plt.ylabel('Temperatura')
     plt.title('Temperatura con respecto al Tiempo')
@@ -104,8 +124,9 @@ def generate_graph2(data, i):
 
 def generate_graph3(data, i):
     plt.cla()
-    plt.figure(figsize=(5, 4),dpi=50)
-    plt.plot(data['Tiempo'][:i+1], data['Presion'][:i+1])  
+    plt.figure(figsize=(6.5, 4),dpi=50,facecolor="#F0F0F0")
+    plt.gca().set_facecolor('#F0F0F0')
+    plt.plot(data['Tiempo'][:i+1], data['Presion'][:i+1], color="#4B299D")  
     plt.xlabel('Tiempo')
     plt.ylabel('Presion')
     plt.title('Presion con respecto al Tiempo')
@@ -117,8 +138,9 @@ def generate_graph3(data, i):
 
 def generate_graph4(data, i):
     plt.cla()
-    plt.figure(figsize=(5, 4),dpi=50)
-    plt.plot(data['Tiempo'][:i+1], data['Velocidad'][:i+1])  
+    plt.figure(figsize=(6.5, 4),dpi=50,facecolor="#F0F0F0")
+    plt.gca().set_facecolor('#F0F0F0')
+    plt.plot(data['Tiempo'][:i+1], data['Velocidad'][:i+1], color="#4B299D")  
     plt.xlabel('Tiempo')
     plt.ylabel('Velocidad')
     plt.title('Velocidad con respecto al Tiempo')
@@ -130,8 +152,9 @@ def generate_graph4(data, i):
 
 def generate_graph5(data, i):
     plt.cla()
-    plt.figure(figsize=(5, 4),dpi=50)
-    plt.plot(data['Tiempo'][:i+1], data['Aceleracion'][:i+1])  
+    plt.figure(figsize=(6.5, 4),dpi=50,facecolor="#F0F0F0")
+    plt.gca().set_facecolor('#F0F0F0')
+    plt.plot(data['Tiempo'][:i+1], data['Aceleracion'][:i+1], color="#4B299D")  
     plt.xlabel('Tiempo')
     plt.ylabel('Aceleracion')
     plt.title('Aceleracion con respecto al Tiempo')
@@ -152,7 +175,7 @@ latitud, longitud = obtener_ubicacion_actual()
 des_latitud = "20.1352721"
 des_long = "-98.385339"
 zoom = 18
-tamaño = "400x300"
+tamaño = "550x550"
 
 mapa = cargar_mapa(latitud, longitud,des_latitud,des_long, zoom, tamaño)
 
@@ -166,9 +189,47 @@ while running:
             running = False
 
     # Limpiar la pantalla
-    screen.fill(WHITE)
-    screen.blit(mapa, (50, 450))
+        screen.fill(lila)
 
+    # Inicio de zona de dibujo de interfaz
+        #Cabecera de la interfaz
+    pygame.draw.rect(screen, morado, (0,0, 1920, 80))
+        	# Logo Scorpion
+    screen.blit(logo,(20, 5))
+            # Encabezado
+    draw_text("Estación Terrena", encabezado, WHITE, 110, 0)
+            # Boton de reporte de Misión
+    if boton_reporte.draw(screen):
+        print('Reporte')
+            # Logo Scorpion
+    screen.blit(logou,(1820, 5))
+        # Tablero de datos
+    pygame.draw.rect(screen, WHITE, (10, 90, 1900, 890), width=0, border_radius=10)
+
+# Tabla de alturas
+    pygame.draw.rect(screen, lila, (30, 100, 190, 40), width=0, border_radius=10)
+    draw_text("Tabla de alturas", seccion, BLACK, 45, 105)        
+    pygame.draw.rect(screen, morado, (20, 140, 550, 240), width=0, border_radius=10)
+                # Altura actual
+    pygame.draw.rect(screen, lila, (23, 143, 120, 76), width=0, border_radius=5)
+    draw_text("Altura actual", tablaE, BLACK, 30, 170)
+    pygame.draw.rect(screen, WHITE, (146, 143, 420, 76), width=0, border_radius=5)
+                # Altura máxima
+    pygame.draw.rect(screen, lila, (23, 222, 120, 76), width=0, border_radius=5)
+    draw_text("Altura máxima", tablaE, BLACK, 30, 250)
+    pygame.draw.rect(screen, WHITE, (146, 222, 420, 76), width=0, border_radius=5)
+                # Altura de desacople
+    pygame.draw.rect(screen, lila, (23, 301, 120, 76), width=0, border_radius=5)
+    draw_text("Altura de", tablaE, BLACK, 30, 320)
+    draw_text("desacople", tablaE, BLACK, 30, 333)
+    pygame.draw.rect(screen, WHITE, (146, 301, 420, 76), width=0, border_radius=5)
+
+# Mapa       
+    screen.blit(mapa, (20, 420))
+    pygame.draw.rect(screen, lila, (30, 390, 200, 40), width=0, border_radius=10)
+    draw_text("Ubicación actual", seccion, BLACK, 45, 395)
+    
+# Graficas
     # Generar la gráfica
     graph_image = generate_graph(data, i)
     graph_image2 = generate_graph2(data, i)
@@ -176,12 +237,40 @@ while running:
     graph_image4 = generate_graph4(data, i)
     graph_image5 = generate_graph5(data, i)
 
+    # Fondo y titulos de las gáficas
+    pygame.draw.rect(screen, gris, (590, 120, 350, 250), width=0, border_radius=10)
+    pygame.draw.rect(screen, lila, (600, 100, 190, 40), width=0, border_radius=10)
+    draw_text("Tempreratura", seccion, BLACK, 605, 105)   
+    pygame.draw.rect(screen, gris, (950, 120, 350, 250), width=0, border_radius=10)
+    pygame.draw.rect(screen, lila, (960, 100, 230, 40), width=0, border_radius=10)
+    draw_text("Presion atmosferica", seccion, BLACK, 965, 105)    
+    pygame.draw.rect(screen, gris, (590, 400, 710, 290), width=0, border_radius=10)
+    pygame.draw.rect(screen, lila, (600, 380, 100, 40), width=0, border_radius=10)
+    draw_text("Altitud", seccion, BLACK, 605, 385)    
+    pygame.draw.rect(screen, gris, (590, 720, 350, 250), width=0, border_radius=10)
+    pygame.draw.rect(screen, lila, (600, 700, 190, 40), width=0, border_radius=10)
+    draw_text("Velocidad", seccion, BLACK, 605, 705)   
+    pygame.draw.rect(screen, gris, (950, 720, 350, 250), width=0, border_radius=10)
+    pygame.draw.rect(screen, lila, (960, 700, 190, 40), width=0, border_radius=10)
+    draw_text("Aceleración", seccion, BLACK, 965, 705)  
+
     # Dibujar la gráfica
-    draw_graph(screen, graph_image)
-    draw_graph2(screen, graph_image2)
-    draw_graph3(screen, graph_image3)
-    draw_graph4(screen, graph_image4)
-    draw_graph5(screen, graph_image5)
+    draw_graph(screen, graph_image, 600, 430)
+    draw_graph(screen, graph_image2, 600, 150)
+    draw_graph(screen, graph_image3, 960, 150)
+    draw_graph(screen, graph_image4, 600, 750)
+    draw_graph(screen, graph_image5, 960, 750)
+# Giroscopio
+    # Gráfico altura
+    pygame.draw.rect(screen, gris, (1310, 120, 590, 410), width=0, border_radius=10)
+    pygame.draw.rect(screen, lila, (1320, 100, 190, 40), width=0, border_radius=10)
+    draw_text("Gráfico altura", seccion, BLACK, 1325, 105) 
+    # Modelo 3d
+    pygame.draw.rect(screen, gris, (1310, 560, 590, 410), width=0, border_radius=10)
+    pygame.draw.rect(screen, lila, (1320, 540, 190, 40), width=0, border_radius=10)
+    draw_text("Giroscopio", seccion, BLACK, 1325, 545) 
+
+    # Fin de zona de dibujo de interfaz
 
     # Actualizar la pantalla
     pygame.display.flip()
