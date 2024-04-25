@@ -29,7 +29,9 @@ marcadorT  =  (170, 192, 255)
 # Definir la pantalla
 size = (1920, 990)
 screen = pygame.display.set_mode(size, pygame.RESIZABLE)
+icono = pygame.image.load('Img/lia.png')
 pygame.display.set_caption("Equipo Scorpion")
+pygame.display.set_icon(icono)
 
 # Cargar imagenes
 logo = pygame.image.load('Img/Scorpion.png')
