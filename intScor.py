@@ -62,11 +62,11 @@ def load_data_from_csv(filename):
 
 
 # Función para cargar el mapa de Google Maps
-def cargar_mapa(mi_latitud, mi_longitud, destino_latitud, destino_longitud, zoom, tamaño):
+def cargar_mapa(mi_latitud, mi_longitud, destino_latitud, destino_longitud, zoom=18, tamaño="550x550"):
     api_key = "AIzaSyDzdqPpaND_WEWZauxETqi5AdfhaCDI7yw" 
     maptype = "satellite"
     marker_destino = f"markers=color:red|label:D|{destino_latitud},{destino_longitud}"
-    marker_origen = f"markers=color:green|label:U|{mi_latitud},{mi_longitud}"
+    marker_origen = f"markers=color:green|label:O|{mi_latitud},{mi_longitud}"
     distancia = geodesic((mi_latitud, mi_longitud), (destino_latitud, destino_longitud)).meters
     texto_distancia = f"Distancia al destino: {distancia:.2f} mts"
     url = f"https://maps.googleapis.com/maps/api/staticmap?center={destino_latitud},{destino_longitud}&zoom={zoom}&size={tamaño}&key={api_key}&maptype={maptype}&{marker_destino}&{marker_origen}&markers=size:mid|color:blue|label:D|{mi_latitud},{mi_longitud}&path=color:0x0000ff|weight:5|{mi_latitud},{mi_longitud}|{destino_latitud},{destino_longitud}"
@@ -82,18 +82,21 @@ def cargar_mapa(mi_latitud, mi_longitud, destino_latitud, destino_longitud, zoom
     return mapa
 
 def obtener_ubicacion_actual():
-    api_key = "AIzaSyDzdqPpaND_WEWZauxETqi5AdfhaCDI7yw" 
-    url = f"https://www.googleapis.com/geolocation/v1/geolocate?key={api_key}"
-    response = requests.post(url)
-    data = response.json()
-    #print(data)
-    if 'location' in data:
-        latitud = data['location']['lat']
-        longitud = data['location']['lng']
-        return latitud, longitud
-    else:
-        print("No se pudo obtener la ubicación.")
-        return None, None
+    try:
+        api_key = "AIzaSyDzdqPpaND_WEWZauxETqi5AdfhaCDI7yw" 
+        url = f"https://www.googleapis.com/geolocation/v1/geolocate?key={api_key}"
+        response = requests.post(url)
+        data = response.json()
+        print(data)
+        if 'location' in data:
+            latitud = data['location']['lat']
+            longitud = data['location']['lng']
+            return latitud, longitud
+        else:
+            print("No se pudo obtener la ubicación.")
+            return None, None
+    except Exception as e:
+        print(e)
 
 # Función para generar la gráfica usando matplotlib
 def generate_graph(data, i):
@@ -176,10 +179,10 @@ latitud, longitud = obtener_ubicacion_actual()
 # Destino debera tener las del satelite cansat
 des_latitud = "20.133534"
 des_long = "-98.383157"
-zoom = 18
-tamaño = "550x550"
+#zoom = 18
+#tamaño = "550x550"
 
-mapa = cargar_mapa(latitud, longitud,des_latitud,des_long, zoom, tamaño)
+mapa = cargar_mapa(latitud, longitud,des_latitud,des_long)
 
 
 # Bucle principal
