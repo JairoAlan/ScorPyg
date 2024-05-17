@@ -9,6 +9,9 @@ import button
 from PIL import Image,ImageDraw, ImageFont
 from geopy.distance import geodesic
 
+
+
+
 x = 0
 y = 30
 os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (x,y)
@@ -169,9 +172,13 @@ def generate_graph5(data, i):
     plt.close()
     return pygame.image.load(buf)
 
+####################################################################################################################
+
+#######################################################################################################################
+
 # Cargar datos desde el archivo CSV
 filename = 'data_Sat.csv'
-data = load_data_from_csv(filename)
+# data = load_data_from_csv(filename)
 
 # Obtiene la ubicación actual
 latitud, longitud = obtener_ubicacion_actual()
@@ -179,16 +186,14 @@ latitud, longitud = obtener_ubicacion_actual()
 # Destino debera tener las del satelite cansat
 des_latitud = "20.133534"
 des_long = "-98.383157"
-#zoom = 18
-#tamaño = "550x550"
 
 mapa = cargar_mapa(latitud, longitud,des_latitud,des_long)
-
 
 # Bucle principal
 running = True
 i = 0
 while running:
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -236,6 +241,7 @@ while running:
     
 # Graficas
     # Generar la gráfica
+    data = load_data_from_csv(filename)
     graph_image = generate_graph(data, i)
     graph_image2 = generate_graph2(data, i)
     graph_image3 = generate_graph3(data, i)
@@ -285,6 +291,8 @@ while running:
 
     # Ajustar la velocidad de la animación según sea necesario
     pygame.time.delay(1000)  # Pausa de 100 milisegundos
-
+    
+    
+    
 # Salir de Pygame
 pygame.quit()
